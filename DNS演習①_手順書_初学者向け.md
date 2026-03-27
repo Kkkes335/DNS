@@ -198,14 +198,14 @@ www IN  A  172.31.27.21
 **「この名前で聞かれたら、このIPアドレスを返す」**  
 という答えを書いているファイルです。
 
-### 6-5. 権限を設定する
+### 6-5. 権限を設定する(必須ではない)
 ```bash
 sudo chown root:named /var/named/yakiniku.entrycl.teamx.local.zone
 sudo chmod 640 /var/named/yakiniku.entrycl.teamx.local.zone
 sudo restorecon -Rv /var/named
 ```
 
-### 6-6. 設定ミスがないか確認する
+### 6-6. 設定ミスがないか確認する(必須)
 起動前に、設定ファイルに誤字や書き間違いがないか確認します。
 
 ```bash
