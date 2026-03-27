@@ -245,9 +245,9 @@ $TTL 60
 
     IN  NS  ns1.teamx.rplearn.net.
 
-ns1 IN  A   203.0.113.20
-www IN  A   198.51.100.10
-db  IN  A   172.31.10.20
+ns1 IN A <DNSサーバのパブリックIP>
+www IN A <WebサーバのパブリックIP>
+db  IN A <DBサーバのプライベートIP>
 ```
 
 ### 8-7. レコードの意味
