@@ -10,7 +10,7 @@
 - **1台目**：Apache + PHP-FPM + WordPress
 - **2台目**：MariaDB + BIND
 
-そして、実在する `rplearn.net` から払い出された **サブドメイン** を使って、
+そして、実在する `entrycl.net` から払い出された **サブドメイン** を使って、
 インターネット上から **ドメイン名で WordPress にアクセスできる状態** を作ります。
 
 さらに、WordPress からデータベースへ接続するときは、  
@@ -22,7 +22,7 @@
 
 この演習のゴールは次のとおりです。
 
-- `rplearn.net` 配下のサブドメインの権限移譲を依頼できる
+- `entrycl.net` 配下のサブドメインの権限移譲を依頼できる
 - BINDでそのサブドメインの権威DNSを作れる
 - `www` レコードで WordPress 公開サーバへ名前解決できる
 - `db` レコードで MariaDB サーバをホスト名で引ける
@@ -59,33 +59,33 @@
 最初に、チームで以下を決めてメモしてください。
 
 - 払い出してもらいたいサブドメイン名  
-  例：`teamx.rplearn.net`
+  例：`teamx.entrycl.net`
 - WebサーバのパブリックIP
 - WebサーバのプライベートIP
 - DB/DNSサーバのパブリックIP
 - DB/DNSサーバのプライベートIP
 - 権威DNS名  
-  例：`ns1.teamx.rplearn.net`
+  例：`ns1.teamx.entrycl.net`
 
 ---
 
 ## 5. 権限移譲で必要な情報
 
-今回、講師へ依頼するのは **親ドメイン `rplearn.net` から、自分たちのサブドメインを委譲してもらうこと** です。
+今回、講師へ依頼するのは **親ドメイン `entrycl.net` から、自分たちのサブドメインを委譲してもらうこと** です。
 
 ### 5-1. 依頼時に必要な情報
 最低限、次の情報を伝えられるようにします。
 
 - 払い出してほしいサブドメイン名  
-  例：`teamx.rplearn.net`
+  例：`teamx.entrycl.net`
 - そのサブドメインを管理するネームサーバ名  
-  例：`ns1.teamx.rplearn.net`
+  例：`ns1.teamx.entrycl.net`
 - そのネームサーバのパブリックIP  
   例：`203.0.113.20`
 
 ### 5-2. なぜネームサーバ名とIPが必要なのか
 親ドメイン側では、子ドメインへ委譲するために **NSレコード** が必要です。  
-さらに、今回のように `ns1.teamx.rplearn.net` のような **子ドメイン配下の名前** をネームサーバとして使う場合は、  
+さらに、今回のように `ns1.teamx.entrycl.net` のような **子ドメイン配下の名前** をネームサーバとして使う場合は、  
 親側に **glue レコード（A / AAAA）** も必要になることがあります。
 
 ---
@@ -95,16 +95,16 @@
 以下をそのまま使って依頼できます。
 
 ```text
-件名：rplearn.net サブドメイン権限移譲のお願い
+件名：entrycl.net サブドメイン権限移譲のお願い
 
 お疲れさまです。
 DNS演習②で使用するため、以下サブドメインの権限移譲をお願いいたします。
 
 【希望サブドメイン】
-teamx.rplearn.net
+teamx.entrycl.net
 
 【委譲先ネームサーバ】
-ns1.teamx.rplearn.net
+ns1.teamx.entrycl.net
 
 【ns1 のグローバルIP（glue用）】
 203.0.113.20
@@ -219,7 +219,7 @@ zone "." IN {
         file "named.ca";
 };
 
-zone "teamx.rplearn.net" IN {
+zone "teamx.entrycl.net" IN {
         type master;
         file "/var/named/teamx.rplearn.net.zone";
 };
@@ -229,21 +229,21 @@ zone "teamx.rplearn.net" IN {
 
 ### 8-6. ゾーンファイル作成
 ```bash
-sudo vi /var/named/teamx.rplearn.net.zone
+sudo vi /var/named/teamx.entrycl.net.zone
 ```
 
 例:
 
 ```zone
 $TTL 60
-@   IN  SOA ns1.teamx.rplearn.net. root.teamx.rplearn.net. (
+@   IN  SOA ns1.teamx.entrycl.net. root.teamx.entrycl.net. (
         2026032701 ; serial
         3600       ; refresh
         3600       ; retry
         3600       ; expire
         3600 )     ; minimum
 
-    IN  NS  ns1.teamx.rplearn.net.
+    IN  NS  ns1.teamx.entrycl.net.
 
 ns1 IN A <DNSサーバのパブリックIP>
 www IN A <WebサーバのパブリックIP>
@@ -283,15 +283,15 @@ www IN A 203.0.113.10
 
 ### 8-8. 権限調整
 ```bash
-sudo chown root:named /var/named/teamx.rplearn.net.zone
-sudo chmod 640 /var/named/teamx.rplearn.net.zone
+sudo chown root:named /var/named/teamx.entrycl.net.zone
+sudo chmod 640 /var/named/teamx.entrycl.net.zone
 sudo restorecon -Rv /var/named
 ```
 
 ### 8-9. 構文確認
 ```bash
 sudo named-checkconf
-sudo named-checkzone teamx.rplearn.net /var/named/teamx.rplearn.net.zone
+sudo named-checkzone teamx.rplearn.net /var/named/teamx.entrycl.net.zone
 ```
 
 ### 8-10. BIND 起動
@@ -371,7 +371,7 @@ WordPress は `wp-config.php` の `DB_HOST` で、
 **どのデータベースサーバへ接続するか** を決めます。
 
 今回は IPアドレスではなく、DNS名で接続したいので、  
-`DB_HOST` に `db.teamx.rplearn.net` を書きます。
+`DB_HOST` に `db.teamx.entrycl.net` を書きます。
 
 ### 10-1. `wp-config.php` 作成
 ```bash
@@ -386,12 +386,12 @@ sudo vi wp-config.php
 define( 'DB_NAME', 'wordpress' );
 define( 'DB_USER', 'wpuser' );
 define( 'DB_PASSWORD', 'WordPressPass123!' );
-define( 'DB_HOST', 'db.teamx.rplearn.net' );
+define( 'DB_HOST', 'db.teamx.entrycl.net' );
 ```
 
 ### 10-2. まず名前解決できるか確認
 ```bash
-getent hosts db.teamx.rplearn.net
+getent hosts db.teamx.entrycl.net
 ```
 
 ### 10-3. DB接続確認
@@ -408,27 +408,27 @@ mysql -h db.teamx.rplearn.net -u wpuser -p -e "SHOW DATABASES;"
 
 ### 11-1. BINDサーバ自身で確認
 ```bash
-dig @localhost teamx.rplearn.net NS
-dig @localhost www.teamx.rplearn.net
-dig @localhost db.teamx.rplearn.net
+dig @localhost teamx.entrycl.net NS
+dig @localhost www.teamx.entrycl.net
+dig @localhost db.teamx.entrycl.net
 ```
 
 ### 11-2. Webサーバから確認
 ```bash
-dig www.teamx.rplearn.net
-dig db.teamx.rplearn.net
+dig www.teamx.entrycl.net
+dig db.teamx.entrycl.net
 ```
 
 ### 11-3. インターネット公開確認
 委譲が反映したら、次を確認します。
 
 ```bash
-dig NS teamx.rplearn.net
-dig www.teamx.rplearn.net
+dig NS teamx.entrycl.net
+dig www.teamx.entrycl.net
 ```
 
 確認ポイント:
-- `NS` に `ns1.teamx.rplearn.net` が返る
+- `NS` に `ns1.teamx.entrycl.net` が返る
 - `www` に WebサーバのパブリックIP が返る
 - `db` に DBサーバのプライベートIP が返る
 
@@ -439,7 +439,7 @@ dig www.teamx.rplearn.net
 ブラウザで次へアクセスします。
 
 ```text
-http://www.teamx.rplearn.net
+http://www.teamx.entrycl.net
 ```
 
 WordPress の初期設定画面が表示されれば成功です。
@@ -461,7 +461,7 @@ WordPress の初期設定画面が表示されれば成功です。
 確認:
 ```bash
 sudo named-checkconf
-sudo named-checkzone teamx.rplearn.net /var/named/teamx.rplearn.net.zone
+sudo named-checkzone teamx.entrycl.net /var/named/teamx.entrycl.net.zone
 ```
 
 ### 13-3. WordPress が DB接続エラーになる
@@ -472,8 +472,8 @@ sudo named-checkzone teamx.rplearn.net /var/named/teamx.rplearn.net.zone
 
 確認:
 ```bash
-getent hosts db.teamx.rplearn.net
-mysql -h db.teamx.rplearn.net -u wpuser -p
+getent hosts db.teamx.entrycl.net
+mysql -h db.teamx.entrycl.net -u wpuser -p
 ```
 
 ### 13-4. `www` でアクセスできない
@@ -487,7 +487,7 @@ mysql -h db.teamx.rplearn.net -u wpuser -p
 
 この演習では、2台構成で以下を実施します。
 
-- `rplearn.net` 配下サブドメインの権限移譲依頼
+- `entrycl.net` 配下サブドメインの権限移譲依頼
 - BIND による子ゾーンの権威DNS構築
 - `www` を使った WordPress の公開
 - `db` を使った MariaDB のホスト名接続
